@@ -110,8 +110,12 @@ export const Config = z.object({
 
 /**
  * Mount both plugins. The gateway starts polling only when credentials are
- * present (resolved from the `credentials` service at startup — see
- * `resolveCredentials` in this module's apply helper).
+ * present (resolved from the `credentials` service at startup).
+ *
+ * Cordis scoping note: services mounted via `ctx.plugin()` from this apply
+ * context are visible to child contexts (the conversation node resolves
+ * `wechat` fine) but NOT to a direct property access on the apply context
+ * itself, so the credentials boot runs inside an injected child scope.
  */
 export function apply(ctx: Context, config: Config): void {
   const gatewayConfig = extractGatewayConfig(config)
@@ -129,7 +133,9 @@ export function apply(ctx: Context, config: Config): void {
   })
   // Credentials go through the dsh credentials service — never in the patch
   // file. Resolve them at boot and start polling only when they exist.
-  void bootWithCredentials(ctx, config)
+  ctx.inject(['wechat', 'credentials'], (bootCtx) => {
+    void bootWithCredentials(bootCtx, config)
+  })
 }
 
 /**
