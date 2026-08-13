@@ -46,7 +46,10 @@ tools:
 ## Install into DeepSeek Harness
 
 ```sh
-# from a clone of this repo
+# from npm (once published)
+dsh plugin --profile <your-profile> add @dsh-cowork/plugin
+
+# or from a clone of this repo (local development)
 dsh plugin --profile <your-profile> add ./packages/dsh
 ```
 
