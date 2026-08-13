@@ -28,5 +28,22 @@
     "jszip": "^3.10.1",
     "mammoth": "^1.8.0",
     "pdfjs-dist": "^6.0.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jesse-njx/dsh-cowork.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "documents",
+    "xlsx",
+    "pdf",
+    "docx",
+    "pptx",
+    "ipynb"
+  ]
 }

@@ -17,5 +17,17 @@
   "devDependencies": {
     "@types/node": "^24.13.3",
     "typescript": "^5.9.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jesse-njx/dsh-cowork.git"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "documents",
+    "office",
+    "notebook"
+  ]
 }

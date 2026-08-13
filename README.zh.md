@@ -41,10 +41,9 @@ DSH Cowork 以**仓库外插件**的方式补齐了这个缺口（无需 fork、
 ## 安装到 DeepSeek Harness
 
 ```sh
-# 方式一：从 npm 安装（发布后）
-dsh plugin --profile <你的profile> add @dsh-cowork/plugin
-
-# 方式二：从仓库克隆目录安装（本地开发）
+# 从仓库克隆后安装（当前分发方式：GitHub，不发布到 npm）
+git clone https://github.com/Jesse-njx/dsh-cowork.git
+cd dsh-cowork
 dsh plugin --profile <你的profile> add ./packages/dsh
 ```
 
