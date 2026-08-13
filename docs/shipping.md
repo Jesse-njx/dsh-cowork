@@ -1,7 +1,10 @@
 # Shipping DSH Cowork
 
-Everything in this doc is prepared; each step needs your accounts (npm /
-GitHub). Do them in order.
+Status: GitHub repo live ([Jesse-njx/dsh-cowork](https://github.com/Jesse-njx/dsh-cowork),
+`dsh-plugin` topic set), awesome-list [PR #3](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/3)
+open, Discussions [post #350](https://github.com/deepseek-ai/deepseek-harness/discussions/350) live.
+**npm publish is BLOCKED on the account's 2FA** (403: publish requires a
+one-time password or a bypass-2FA token).
 
 ## 0. Preflight (verified locally)
 
@@ -22,11 +25,19 @@ GitHub). Do them in order.
   'prepare'`). Only `@dsh-cowork/core` is a regular dependency — it is pure TS
   and carries no cordis state.
 
-## 1. Publish to npm
+## 1. Publish to npm — BLOCKED on 2FA
 
-Prerequisites: an npm account with access to the `@dsh-cowork` scope
-(`npm login`). If the scope isn't yours yet, create it — npm auto-creates
-unclaimed scopes on first publish (`--access public`).
+`npm whoami` → `jessenjx` (logged in), but publishing returns
+`403 Forbidden … Two-factor authentication … is required`. The `@dsh-cowork`
+scope is unclaimed; the first publish will claim it.
+
+Unblock ONE of these (user action):
+- `npm publish --otp <code>` per package (OTP from your authenticator), or
+- npm web → Access Tokens → generate a **granular token with bypass 2FA**
+  enabled and put it in `~/.npmrc`, or
+- temporarily switch the account's 2FA to **auth-only** in npm settings.
+
+Then publish:
 
 ```sh
 node scripts/publish.mjs --dry-run   # preview
@@ -49,56 +60,21 @@ a cell edit, then `doc_read` again to verify. Expected: addressed markdown
 windows, `> Truncated:` notices on large files, `[sandbox: write denied]` in
 read-only mode.
 
-## 3. GitHub repo
+## 3. GitHub repo — DONE
 
-```sh
-git remote add origin https://github.com/Jesse-njx/dsh-cowork.git
-git push -u origin main
-```
+https://github.com/Jesse-njx/dsh-cowork (public, main pushed).
+Topics set: `dsh-plugin`, `deepseek-harness`, `mcp`, `office-documents`.
+Local WIP (`chatnode-wechat`, the WeChat bridge) is preserved on the local
+branch `wip/chatnode-wechat` — finish it, then push it when ready.
 
-Repo settings:
+## 4. Awesome list PR — DONE
 
-- **Topics**: `dsh-plugin` (required by deepseek-harness CONTRIBUTING.md)
-  plus `deepseek-harness`, `mcp`, `office-documents`, `plugin`.
-- **Description**: "READ + WRITE for office documents & notebooks in
-  DeepSeek Harness — doc_read/doc_write tools (xlsx, pdf, docx, pptx, ipynb)".
+https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/3 (adds the entry
+under 🛠️ Tools & Capabilities in both README.md and README.zh.md).
 
-## 4. Awesome list PR
+## 5. Discussions post — DONE
 
-Repo: https://github.com/awesome-dsh-plugin/awesome-dsh-plugin
-Add one line under **🛠️ Tools & Capabilities** in both `README.md` and
-`README.zh.md`:
-
-English (README.md):
-
-```md
-- [dsh-cowork](https://github.com/Jesse-njx/dsh-cowork) — doc_read/doc_write: bounded, cell-addressed reading and editing of xlsx / pdf / docx / pptx / ipynb, plus an MCP server and CLI.
-```
-
-Chinese (README.zh.md, adjust to the actual zh category heading):
-
-```md
-- [dsh-cowork](https://github.com/Jesse-njx/dsh-cowork) — doc_read/doc_write：以有界、单元格寻址的方式读取与编辑 xlsx / pdf / docx / pptx / ipynb，附 MCP 服务器与 CLI。
-```
-
-## 5. Discussions post
-
-Post on https://github.com/deepseek-ai/deepseek-harness/discussions (the
-ecosystem channel CONTRIBUTING.md points at):
-
-```md
-# DSH Cowork — native office-document & notebook reading/writing for DSH
-
-`dsh plugin add @dsh-cowork/plugin` gives your agent `doc_read` / `doc_write`:
-
-- **Read**: xlsx (cell-addressed windows), pdf (pages), docx, pptx (shape ids), ipynb (cells + outputs)
-- **Write (v1)**: create/edit xlsx by cell ref; create/edit ipynb by cell index
-- **Safety**: zip-bomb caps, macro-format rejection, read-only mode gating,
-  hash-checked edits, atomic writes, explicit truncation notices
-
-Also ships as an **MCP server** (for Codex / Claude Code) and a **CLI +
-SKILL.md** (for pi). Repo tagged `dsh-plugin`. Feedback welcome!
-```
+https://github.com/deepseek-ai/deepseek-harness/discussions/350 (Show and tell).
 
 ## 6. Follow-ups (v2)
 
