@@ -52,7 +52,7 @@ read-only mode.
 ## 3. GitHub repo
 
 ```sh
-git remote add origin git@github.com:<you>/dsh-cowork.git
+git remote add origin https://github.com/Jesse-njx/dsh-cowork.git
 git push -u origin main
 ```
 
@@ -72,13 +72,13 @@ Add one line under **🛠️ Tools & Capabilities** in both `README.md` and
 English (README.md):
 
 ```md
-- [dsh-cowork](https://github.com/<you>/dsh-cowork) — doc_read/doc_write: bounded, cell-addressed reading and editing of xlsx / pdf / docx / pptx / ipynb, plus an MCP server and CLI.
+- [dsh-cowork](https://github.com/Jesse-njx/dsh-cowork) — doc_read/doc_write: bounded, cell-addressed reading and editing of xlsx / pdf / docx / pptx / ipynb, plus an MCP server and CLI.
 ```
 
 Chinese (README.zh.md, adjust to the actual zh category heading):
 
 ```md
-- [dsh-cowork](https://github.com/<you>/dsh-cowork) — doc_read/doc_write：以有界、单元格寻址的方式读取与编辑 xlsx / pdf / docx / pptx / ipynb，附 MCP 服务器与 CLI。
+- [dsh-cowork](https://github.com/Jesse-njx/dsh-cowork) — doc_read/doc_write：以有界、单元格寻址的方式读取与编辑 xlsx / pdf / docx / pptx / ipynb，附 MCP 服务器与 CLI。
 ```
 
 ## 5. Discussions post
