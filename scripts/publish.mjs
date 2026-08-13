@@ -6,6 +6,7 @@
  *
  * Order matters: `@dsh-cowork/plugin`, `@dsh-cowork/mcp`, and
  * `@dsh-cowork/cli` all depend on `@dsh-cowork/core`, so core goes first.
+ * `@dsh-cowork/chatnode-wechat` has no workspace deps and publishes anywhere.
  * Requires: logged into npm as the account that owns the @dsh-cowork scope
  * (see docs/shipping.md).
  */
@@ -19,7 +20,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..')
 const dryRun = process.argv.includes('--dry-run')
 
-const order = ['core', 'dsh', 'mcp', 'cli']
+const order = ['core', 'dsh', 'mcp', 'cli', 'chatnode-wechat']
 
 for (const pkg of order) {
   const dir = join(root, 'packages', pkg)

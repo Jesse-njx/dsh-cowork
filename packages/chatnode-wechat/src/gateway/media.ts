@@ -1,0 +1,174 @@
+/**
+ * WeChat CDN media download + AES-128-ECB decryption.
+ *
+ * iLink delivers image/video/file/voice items as an encrypted CDN reference:
+ * `encrypt_query_param` (or `full_url`) plus an `aes_key`. The key travels
+ * base64-encoded and may be either 16 raw bytes or a 32-char hex string.
+ * Decryption is AES-128-ECB with PKCS#7 padding, per the hermes-agent
+ * reference implementation.
+ *
+ * @module @dsh-cowork/chatnode-wechat/gateway/media
+ */
+
+import { createCipheriv, createDecipheriv } from 'node:crypto'
+import { WEIXIN_CDN_BASE_URL } from './types.ts'
+
+/** CDN hosts the client is allowed to fetch media from (SSRF guard). */
+export const DEFAULT_CDN_ALLOWLIST: readonly string[] = [
+  'novac2c.cdn.weixin.qq.com',
+  'ilinkai.weixin.qq.com',
+  'wx.qlogo.cn',
+  'thirdwx.qlogo.cn',
+  'res.wx.qq.com',
+  'mmbiz.qpic.cn',
+  'mmbiz.qlogo.cn',
+]
+
+/** PKCS#7 pad a plaintext to a full AES block. */
+export function pkcs7Pad(data: Uint8Array, blockSize = 16): Uint8Array {
+  const padLen = blockSize - (data.length % blockSize)
+  const out = new Uint8Array(data.length + padLen)
+  out.set(data)
+  out.fill(padLen, data.length)
+  return out
+}
+
+/** Strip a valid PKCS#7 pad; returns the input unchanged when the pad is malformed. */
+export function pkcs7Unpad(data: Uint8Array): Uint8Array {
+  if (data.length === 0) return data
+  const last = data[data.length - 1]
+  if (last === undefined) return data
+  if (last >= 1 && last <= 16 && data.length >= last) {
+    let valid = true
+    for (let i = data.length - last; i < data.length; i++) {
+      if (data[i] !== last) {
+        valid = false
+        break
+      }
+    }
+    if (valid) return data.subarray(0, data.length - last)
+  }
+  return data
+}
+
+/** AES-128-ECB encrypt (used by fixtures and the fake server). */
+export function aes128EcbEncrypt(plaintext: Uint8Array, key: Uint8Array): Uint8Array {
+  const cipher = createCipheriv('aes-128-ecb', key, null) as unknown as {
+    update(data: Uint8Array): Uint8Array
+    final(): Uint8Array
+  }
+  // Node's Cipheriv.update accepts Uint8Array; typing is Buffer-typed upstream.
+  const padded = pkcs7Pad(plaintext)
+  return Buffer.concat([Buffer.from(cipher.update(padded)), Buffer.from(cipher.final())])
+}
+
+/** AES-128-ECB decrypt with PKCS#7 unpad. */
+export function aes128EcbDecrypt(ciphertext: Uint8Array, key: Uint8Array): Uint8Array {
+  const decipher = createDecipheriv('aes-128-ecb', key, null) as unknown as {
+    update(data: Uint8Array): Uint8Array
+    final(): Uint8Array
+  }
+  const out = Buffer.concat([Buffer.from(decipher.update(ciphertext)), Buffer.from(decipher.final())])
+  return pkcs7Unpad(out)
+}
+
+/**
+ * Parse an iLink `aes_key`. Accepts base64 of 16 raw bytes, or base64 of a
+ * 32-char hex string (the wire sometimes hex-encodes then base64-encodes).
+ * @throws when the decoded form matches neither shape.
+ */
+export function parseAesKey(aesKeyBase64: string): Uint8Array {
+  const decoded = Buffer.from(aesKeyBase64, 'base64')
+  if (decoded.length === 16) return decoded
+  if (decoded.length === 32) {
+    const text = decoded.toString('ascii')
+    if (text && /^[0-9a-fA-F]{32}$/.test(text)) return Buffer.from(text, 'hex')
+  }
+  throw new Error(`unexpected aes_key format (${decoded.length} decoded bytes)`)
+}
+
+/** Build the CDN download URL for an encrypted media reference. */
+export function cdnDownloadUrl(cdnBaseUrl: string, encryptedQueryParam: string): string {
+  return `${cdnBaseUrl.replace(/\/+$/, '')}/download?encrypted_query_param=${encodeURIComponent(encryptedQueryParam)}`
+}
+
+/**
+ * Assert a media URL points at a known WeChat CDN host over http(s).
+ * @throws on anything else (SSRF guard, mirrors hermes-agent's allowlist).
+ */
+export function assertWeixinCdnUrl(url: string, allow: readonly string[] = DEFAULT_CDN_ALLOWLIST): void {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new Error(`Unparseable media URL: ${url}`)
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error(`Media URL has disallowed scheme ${parsed.protocol}; only http/https are permitted.`)
+  }
+  if (!allow.includes(parsed.hostname)) {
+    throw new Error(`Media URL host ${parsed.hostname!} is not in the WeChat CDN allowlist. Refusing to fetch to prevent SSRF.`)
+  }
+}
+
+/**
+ * Download one media item's bytes and decrypt them.
+ *
+ * @param fetchImpl - injectable fetch (defaults to global fetch) for tests.
+ * @throws when the item has no usable URL, the host is not allowlisted, or the
+ *   download/decrypt fails.
+ */
+export async function downloadMedia(
+  opts: {
+    cdnBaseUrl?: string
+    encryptedQueryParam?: string
+    aesKeyBase64?: string
+    fullUrl?: string
+    allowHosts?: readonly string[]
+    timeoutMs?: number
+    fetchImpl?: typeof fetch
+  },
+): Promise<Uint8Array> {
+  const {
+    cdnBaseUrl = WEIXIN_CDN_BASE_URL,
+    encryptedQueryParam,
+    aesKeyBase64,
+    fullUrl,
+    allowHosts,
+    timeoutMs = 60_000,
+    fetchImpl = fetch,
+  } = opts
+  let url: string
+  if (encryptedQueryParam) {
+    url = cdnDownloadUrl(cdnBaseUrl, encryptedQueryParam)
+  } else if (fullUrl) {
+    url = fullUrl
+  } else {
+    throw new Error('media item had neither encrypt_query_param nor full_url')
+  }
+  assertWeixinCdnUrl(url, allowHosts)
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const response = await fetchImpl(url, { signal: controller.signal })
+    if (!response.ok) throw new Error(`media download HTTP ${response.status}`)
+    const raw = new Uint8Array(await response.arrayBuffer())
+    if (aesKeyBase64) return aes128EcbDecrypt(raw, parseAesKey(aesKeyBase64))
+    return raw
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** Best-effort mime guess from a file name. */
+export function mimeFromFilename(filename: string): string {
+  const ext = filename.includes('.') ? filename.split('.').pop()!.toLowerCase() : ''
+  const table: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+    mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm',
+    mp3: 'audio/mpeg', wav: 'audio/wav', m4a: 'audio/mp4', ogg: 'audio/ogg', silk: 'audio/silk',
+    pdf: 'application/pdf', zip: 'application/zip', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  }
+  return table[ext] ?? 'application/octet-stream'
+}

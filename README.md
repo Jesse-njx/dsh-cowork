@@ -42,6 +42,7 @@ tools:
 | `packages/dsh` | **DSH bundle**: `doc_read` / `doc_write` tools (install with `dsh plugin add`) |
 | `packages/mcp` | **MCP server** over stdio — for Codex, Claude Code, any MCP client |
 | `packages/cli` | `doc-read` / `doc-write` binaries + `SKILL.md` (the `pi` harness adapter) |
+| `packages/chatnode-wechat` | **DSH bundle**: chat with / monitor / approve your DSH agents from WeChat (iLink gateway + conversation node) |
 
 ## Install into DeepSeek Harness
 
