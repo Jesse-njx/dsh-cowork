@@ -76,16 +76,10 @@ under 🛠️ Tools & Capabilities in both README.md and README.zh.md).
 
 https://github.com/deepseek-ai/deepseek-harness/discussions/350 (Show and tell).
 
-## 6. chatnode-wechat (user WIP, NOT shipped)
+## 6. chatnode-wechat
 
-Preserved on disk + local branch `wip/chatnode-wechat`. Status (round 3):
-typecheck **passes**, build **passes**, gateway tests **18/18 pass** (iLink
-polling, dedup, retry, circuit breaker, QR login, CDN media decryption,
-SSRF guard). Conversation-node tests: **4 failing + the `node --test` process
-hangs on exit** (cordis contexts never disposed in afterEach). Node-layer
-features mid-flight: outbound digest, chunking, /sessions /use, /new,
-approval round trip, heartbeat. Finish those, then commit + push + publish as
-the 5th package.
+Owned and implemented by a separate dedicated session; not part of this
+repo's shipped set. Leave untracked.
 
 ## 7. Follow-ups (v2)
 
