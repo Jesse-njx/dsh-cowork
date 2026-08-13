@@ -25,7 +25,9 @@ for (const pkg of order) {
   const dir = join(root, 'packages', pkg)
   const name = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).name
   console.log(`\n==> publishing ${name} ${dryRun ? '(dry run)' : ''}`)
-  const args = ['publish', '--access', 'public']
+  // --no-git-checks: the repo may carry local-only WIP commits (chatnode-wechat)
+  // that must not be pushed yet; the packed content is built from the working tree.
+  const args = ['publish', '--access', 'public', '--no-git-checks']
   if (dryRun) args.push('--dry-run')
   try {
     const out = execFileSync('pnpm', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
