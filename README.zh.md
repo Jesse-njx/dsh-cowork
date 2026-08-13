@@ -44,6 +44,7 @@ DSH Cowork 以**仓库外插件**的方式补齐了这个缺口（无需 fork、
 # 从仓库克隆后安装（当前分发方式：GitHub，不发布到 npm）
 git clone https://github.com/Jesse-njx/dsh-cowork.git
 cd dsh-cowork
+pnpm install          # installs deps and builds all packages (prepare)
 dsh plugin --profile <你的profile> add ./packages/dsh
 ```
 

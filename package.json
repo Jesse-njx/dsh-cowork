@@ -12,7 +12,8 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "publish:all": "node scripts/publish.mjs"
+    "publish:all": "node scripts/publish.mjs",
+    "prepare": "pnpm -r build"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

@@ -50,6 +50,7 @@ tools:
 # GitHub delivery (not published to npm)
 git clone https://github.com/Jesse-njx/dsh-cowork.git
 cd dsh-cowork
+pnpm install          # installs deps and builds all packages (prepare)
 dsh plugin --profile <your-profile> add ./packages/dsh
 ```
 
