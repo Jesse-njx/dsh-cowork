@@ -2,7 +2,7 @@
   "name": "dsh-cowork",
   "version": "0.1.0",
   "private": true,
-  "description": "DSH Cowork — READ + WRITE for office documents and notebooks inside DeepSeek Harness (xlsx / pdf / docx / pptx / ipynb)",
+  "description": "DSH Cowork \u2014 READ + WRITE for office documents and notebooks inside DeepSeek Harness (xlsx / pdf / docx / pptx / ipynb)",
   "type": "module",
   "engines": {
     "node": ">=20"

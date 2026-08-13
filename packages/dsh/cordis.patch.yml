@@ -1,0 +1,4 @@
+# DSH Cowork bundle layer: registers the doc_read / doc_write tools.
+- insert:
+    - id: cowork-docs
+      name: '@dsh-cowork/plugin'
