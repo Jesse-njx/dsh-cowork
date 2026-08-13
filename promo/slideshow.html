@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSH Cowork — promo</title>
+<style>
+  :root {
+    --paper: #f5f5f1;
+    --ink: #14161c;
+    --blue: #3b5bff;
+    --blue-soft: #e7ebff;
+    --amber: #e89b2c;
+    --line: rgba(20, 22, 28, 0.16);
+    --line-strong: rgba(20, 22, 28, 0.42);
+    --muted: #5c6170;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #101218; }
+  body { display: grid; place-items: center; font-family: var(--sans); color: var(--ink); }
+
+  /* Scale the fixed 1280x720 stage to any window while preserving 16:9. */
+  .fit {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+  }
+  .stage {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+    transform-origin: center center;
+    box-shadow: 0 24px 80px rgba(0,0,0,.45);
+  }
+
+  /* ---- signature: the spreadsheet grid ---- */
+  .gridlines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px 160px),
+      repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 90px);
+  }
+  .gridlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(to right, var(--line-strong) 0 1px, transparent 1px 1280px),
+      repeating-linear-gradient(to bottom, var(--line-strong) 0 1px, transparent 1px 720px);
+    opacity: .35;
+  }
+  .colhdr {
+    position: absolute;
+    top: 10px;
+    left: 52px;
+    right: 24px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--muted);
+  }
+  .rowhdr {
+    position: absolute;
+    left: 14px;
+    top: 46px;
+    bottom: 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--muted);
+  }
+  .rowhdr b {
+    font-weight: 600;
+    color: var(--ink);
+    transition: color .18s ease;
+  }
+  .rowhdr b.on { color: var(--blue); }
+
+  /* ---- slides ---- */
+  .slides { position: absolute; inset: 0; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 96px 120px 84px 132px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .28s ease, transform .28s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: none; transform: none; }
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 26px;
+  }
+  h1 {
+    font-size: 66px;
+    line-height: 1.04;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    max-width: 960px;
+  }
+  h1 .dim { color: var(--muted); font-weight: 700; }
+  .lead {
+    margin-top: 22px;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 780px;
+  }
+  .lead b, .lead .k { color: var(--ink); font-weight: 600; }
+
+  /* inline code / addresses */
+  code, .cellref {
+    font-family: var(--mono);
+    font-size: .82em;
+    background: rgba(59, 91, 255, .10);
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 1px 7px;
+    border: 1px solid rgba(59, 91, 255, .28);
+  }
+  .cellref.sel {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(59, 91, 255, .22);
+  }
+
+  /* feature cell list */
+  .cells {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    max-width: 900px;
+  }
+  .cell {
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: rgba(255,255,255,.55);
+    padding: 18px 20px;
+  }
+  .cell .t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blue);
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+  .cell .d { font-size: 17px; line-height: 1.42; color: var(--ink); }
+
+  /* the read->write loop visual */
+  .loop {
+    margin-top: 38px;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    max-width: 920px;
+    font-family: var(--mono);
+    font-size: 21px;
+  }
+  .loop .step {
+    flex: 1;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 8px;
+    background: rgba(255,255,255,.6);
+    padding: 20px 22px;
+    position: relative;
+  }
+  .loop .arrow {
+    align-self: center;
+    font-size: 26px;
+    color: var(--blue);
+    padding: 0 14px;
+  }
+  .loop .tag {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* check rows for safety */
+  .checks {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 34px;
+    max-width: 940px;
+  }
+  .check {
+    font-size: 19px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .check::before {
+    content: "✓";
+    font-family: var(--mono);
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  /* adapter row */
+  .adapters {
+    margin-top: 36px;
+    display: flex;
+    gap: 16px;
+  }
+  .adapter {
+    flex: 1;
+    border-top: 3px solid var(--blue);
+    padding-top: 14px;
+  }
+  .adapter .n { font-family: var(--mono); font-size: 17px; font-weight: 700; color: var(--blue); }
+  .adapter .w { margin-top: 6px; font-size: 16px; line-height: 1.45; color: var(--muted); }
+
+  /* terminal slide */
+  .term {
+    margin-top: 40px;
+    background: var(--ink);
+    border-radius: 10px;
+    padding: 26px 28px;
+    max-width: 980px;
+    box-shadow: 0 14px 40px rgba(20,22,28,.25);
+  }
+  .term .bar {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+  .term .bar i {
+    width: 11px; height: 11px; border-radius: 50%;
+    display: inline-block;
+  }
+  .term .bar i:nth-child(1){ background:#ff5f57; }
+  .term .bar i:nth-child(2){ background:#febc2e; }
+  .term .bar i:nth-child(3){ background:#28c840; }
+  .term pre {
+    font-family: var(--mono);
+    font-size: 20px;
+    line-height: 1.6;
+    color: #e8eaf2;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .term .prompt { color: var(--blue); }
+  .term .ok { color: #7dd88f; }
+  .term .dim { color: #9aa0b5; }
+
+  /* footer chrome */
+  .foot {
+    position: absolute;
+    left: 132px; right: 40px; bottom: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .foot .count { color: var(--ink); }
+  .foot .count b { color: var(--blue); font-weight: 700; }
+  .foot .hint { opacity: .8; }
+</style>
+</head>
+<body>
+<div class="fit" id="fit">
+  <div class="stage" id="stage" aria-label="DSH Cowork promo slideshow">
+    <div class="gridlines"></div>
+    <div class="colhdr"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span></div>
+    <div class="rowhdr"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+
+    <div class="slides">
+
+      <section class="slide active" id="s0">
+        <div class="eyebrow">DeepSeek Harness · Plugin</div>
+        <h1>DSH&nbsp;Cowork</h1>
+        <p class="lead"><b>READ + WRITE</b> for office documents and notebooks — <b>xlsx · pdf · docx · pptx · ipynb</b>.</p>
+        <div class="cells" style="grid-template-columns: repeat(4, 1fr); margin-top: 44px; max-width: 900px;">
+          <div class="cell"><div class="t">doc_read</div><div class="d">Bounded, addressed windows</div></div>
+          <div class="cell"><div class="t">doc_write</div><div class="d">Create &amp; edit by cell ref</div></div>
+          <div class="cell"><div class="t">MCP</div><div class="d">Codex · Claude Code</div></div>
+          <div class="cell"><div class="t">CLI</div><div class="d">Terminal + skill files</div></div>
+        </div>
+      </section>
+
+      <section class="slide" id="s1">
+        <div class="eyebrow">The problem</div>
+        <h1>Your agent can’t open a spreadsheet.</h1>
+        <p class="lead">DSH’s <code>read</code> is UTF-8 text only. An <b>xlsx</b> is binary — ask your agent for a cell value and it stares at bytes.</p>
+        <div class="cell" style="max-width: 560px; margin-top: 36px; font-family: var(--mono); font-size: 15px; color: var(--muted); word-break: break-all;">
+          <span class="t" style="color: var(--muted);">sample.xlsx</span><br>
+          PK\x03\x04\x14\x00\x06\x00\x08\x00… \xC3\xA9\xBD… (binary)
+        </div>
+      </section>
+
+      <section class="slide" id="s2">
+        <div class="eyebrow">What it is</div>
+        <h1>Native document tools, inside DSH.</h1>
+        <div class="cells">
+          <div class="cell"><div class="t">doc_read</div><div class="d">Pages, rows, slides, cells — windowed, never a wall of text.</div></div>
+          <div class="cell"><div class="t">doc_write</div><div class="d">Create and edit <span class="cellref">xlsx</span> + <span class="cellref">ipynb</span> by stable address.</div></div>
+          <div class="cell"><div class="t">Formats</div><div class="d"><b>xlsx · pdf · docx · pptx · ipynb</b> in one consistent tool.</div></div>
+          <div class="cell"><div class="t">Caps</div><div class="d">Every read is bounded; truncation is never silent.</div></div>
+        </div>
+      </section>
+
+      <section class="slide" id="s3">
+        <div class="eyebrow">The read → write loop</div>
+        <h1>Stable addresses make it one tool.</h1>
+        <div class="loop">
+          <div class="step"><div class="tag">doc_read</div><span class="cellref sel">A1</span> → Widget &nbsp;·&nbsp; <span class="cellref sel">C12</span> → 42</div>
+          <div class="arrow">→</div>
+          <div class="step"><div class="tag">doc_write</div><span class="cellref sel">A1</span> ← “Widget&nbsp;Live” &nbsp;·&nbsp; verified</div>
+        </div>
+        <p class="lead" style="margin-top: 30px;">Cell refs for spreadsheets, shape ids for slides — <b>addresses</b> line numbers can’t give a binary file.</p>
+      </section>
+
+      <section class="slide" id="s4">
+        <div class="eyebrow">Safe by default</div>
+        <h1>Reads are bounded. Writes are guarded.</h1>
+        <div class="checks">
+          <div class="check">Zip-bomb caps on every archive</div>
+          <div class="check">Macro formats rejected outright</div>
+          <div class="check">Read-only mode blocks all writes</div>
+          <div class="check">Hash-checked, atomic edits</div>
+          <div class="check">Never emits xlsm / docm / pptm</div>
+          <div class="check">Truncation always says so</div>
+        </div>
+      </section>
+
+      <section class="slide" id="s5">
+        <div class="eyebrow">One core, three adapters</div>
+        <h1>DSH bundle · MCP · CLI</h1>
+        <div class="adapters">
+          <div class="adapter"><div class="n">DSH bundle</div><div class="w"><code>doc_read</code> / <code>doc_write</code> tools, native, with the sandbox.</div></div>
+          <div class="adapter"><div class="n">MCP server</div><div class="w">Same tools for <b>Codex</b> and <b>Claude Code</b>.</div></div>
+          <div class="adapter"><div class="n">CLI + skill</div><div class="w">Scriptable <code>doc-read</code> / <code>doc-write</code> for <b>pi</b>.</div></div>
+        </div>
+      </section>
+
+      <section class="slide" id="s6">
+        <div class="eyebrow">Install</div>
+        <h1>One command, and your agent reads workbooks.</h1>
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <pre><span class="prompt">$</span> git clone https://github.com/Jesse-njx/dsh-cowork.git &amp;&amp; cd dsh-cowork &amp;&amp; pnpm i &amp;&amp; dsh plugin --profile web add ./packages/dsh
+<span class="ok">✔ cowork-docs layer composed</span>  <span class="dim"># doc_read · doc_write live</span></pre>
+        </div>
+        <p class="lead" style="margin-top: 26px;">Open source · tagged <span class="cellref">dsh-plugin</span> · on GitHub.</p>
+      </section>
+
+    </div>
+
+    <div class="foot">
+      <span>dsh-cowork</span>
+      <span class="hint">← → to advance</span>
+      <span class="count"><b id="cur">1</b> / <span id="tot">7</span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const cur = document.getElementById('cur');
+  const tot = document.getElementById('tot');
+  const rows = Array.from(document.querySelectorAll('.rowhdr span'));
+  let i = 0;
+  tot.textContent = total;
+
+  function show(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    rows.forEach((r, k) => r.classList.toggle('on', k === i));
+    cur.textContent = i + 1;
+  }
+
+  function next() { show(i + 1); }
+  function prev() { show(i - 1); }
+
+  window.addEventListener('keydown', (e) => {
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace':
+        e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(total - 1); break;
+    }
+  });
+
+  // Click right/left halves advance/retreat (handy for demoing).
+  const stage = document.getElementById('stage');
+  stage.addEventListener('click', (e) => {
+    if (e.target.closest('.term')) return;
+    next();
+  });
+
+  // Keep the fixed 1280x720 stage scaled to fit the window.
+  function fit() {
+    const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+})();
+</script>
+</body>
+</html>

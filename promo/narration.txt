@@ -1,0 +1,36 @@
+DSH Cowork — promo narration
+~1 minute · 7 slides · read aloud while advancing
+================================================
+
+Slide 1 — Title (0:00–0:07, ~7s)
+"Meet DSH Cowork — document reading and writing for DeepSeek Harness.
+Spreadsheets, PDFs, Word documents, slide decks, and notebooks — now
+readable by your agent."
+
+Slide 2 — The problem (0:07–0:15, ~8s)
+"Today, your agent can't open any of them. The built-in read is text-only,
+so an xlsx is just binary noise. Ask for one cell value, and you get bytes."
+
+Slide 3 — What it is (0:15–0:24, ~9s)
+"Cowork adds native document tools. doc_read returns bounded, addressed
+windows — cell references for spreadsheets, pages for PDFs, slides, notebook
+cells. doc_write creates and edits by those same addresses."
+
+Slide 4 — The read→write loop (0:24–0:33, ~9s)
+"Stable addresses are the point. doc_read hands you A1 and C12; doc_write
+consumes them. That's what makes Cowork one read-write loop, not two tools."
+
+Slide 5 — Safe by default (0:33–0:41, ~8s)
+"And it's safe by default: zip-bomb caps, macro files rejected outright,
+read-only mode blocks writes, every edit is hash-checked and atomic, and
+truncation is never silent."
+
+Slide 6 — One core, three adapters (0:41–0:49, ~8s)
+"One core, three adapters — a native DSH bundle, an MCP server for Codex and
+Claude Code, and a CLI with skill files for pi."
+
+Slide 7 — Install (0:49–0:59, ~10s)
+"Install it in one command, and ask your agent to read a workbook."
+
+------------------------------------------------
+Word count: ~180 · Runtime: ~59 seconds
