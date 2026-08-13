@@ -6,3 +6,4 @@ lib/
 *.log
 .dsh/
 .dsh-home/
+.pnpm-store/
