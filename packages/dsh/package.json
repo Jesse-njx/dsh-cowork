@@ -1,7 +1,7 @@
 {
   "name": "@dsh-cowork/plugin",
   "version": "0.1.0",
-  "description": "DSH Cowork — doc_read / doc_write tools for office documents and notebooks (xlsx, pdf, docx, pptx, ipynb) in DeepSeek Harness",
+  "description": "DSH Cowork \u2014 doc_read / doc_write tools for office documents and notebooks (xlsx, pdf, docx, pptx, ipynb) in DeepSeek Harness",
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -15,7 +15,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test \"test/*.test.ts\""
+    "test": "node --test \"test/*.test.ts\"",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
@@ -23,7 +24,7 @@
     "@deepseek-ai/dsh-system-prompt": "^0.1.0-rc.6",
     "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
     "@deepseek-ai/schemastery": "^3.18.1",
-    "@dsh-cowork/core": "file:../core"
+    "@dsh-cowork/core": "workspace:^"
   },
   "dsh": {
     "bundle": {

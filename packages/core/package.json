@@ -1,7 +1,7 @@
 {
   "name": "@dsh-cowork/core",
   "version": "0.1.0",
-  "description": "DSH Cowork core — pure-TS sniff/extract/build for xlsx, pdf, docx, pptx, ipynb with windowing caps and stable addresses",
+  "description": "DSH Cowork core \u2014 pure-TS sniff/extract/build for xlsx, pdf, docx, pptx, ipynb with windowing caps and stable addresses",
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -11,14 +11,17 @@
       "default": "./lib/index.js"
     }
   },
-  "files": ["lib"],
+  "files": [
+    "lib"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test \"test/*.test.ts\""
+    "test": "node --test \"test/*.test.ts\"",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

@@ -18,7 +18,7 @@ importers:
   packages/cli:
     dependencies:
       '@dsh-cowork/core':
-        specifier: file:../core
+        specifier: workspace:^
         version: link:../core
 
   packages/core:
@@ -54,7 +54,7 @@ importers:
         specifier: ^3.18.1
         version: 3.18.1
       '@dsh-cowork/core':
-        specifier: file:../core
+        specifier: workspace:^
         version: link:../core
     devDependencies:
       '@deepseek-ai/dsh-agent':
@@ -97,7 +97,7 @@ importers:
   packages/mcp:
     dependencies:
       '@dsh-cowork/core':
-        specifier: file:../core
+        specifier: workspace:^
         version: link:../core
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
