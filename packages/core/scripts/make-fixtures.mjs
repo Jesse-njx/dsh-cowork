@@ -3,7 +3,7 @@
  * Generate the committed test fixtures (xlsx / pdf / docx / pptx / ipynb).
  * Run from the repo root:  node test/scripts/make-fixtures.mjs
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { execFileSync } from 'node:child_process'
@@ -107,6 +107,11 @@ function slideXml(title, body) {
     console.log('pdf fixture: generated via cupsfilter')
   } catch {
     console.warn('pdf fixture: cupsfilter unavailable — skipping sample.pdf')
+  }
+  try {
+    unlinkSync(txt)
+  } catch {
+    // keep the source on failure for debugging
   }
 }
 
