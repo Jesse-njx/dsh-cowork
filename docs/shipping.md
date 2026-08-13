@@ -3,7 +3,7 @@
 Everything in this doc is prepared; each step needs your accounts (npm /
 GitHub). Do them in order.
 
-## 0. Preflight (already verified locally)
+## 0. Preflight (verified locally)
 
 - `pnpm -r test` — 63 tests green (core 35, plugin 15, cli 6, mcp 7).
 - `pnpm pack` all four packages: manifests rewrite `workspace:^` → `^0.1.0`,
@@ -12,6 +12,15 @@ GitHub). Do them in order.
   override standing in for the not-yet-published core) and run: the CLI reads
   a real docx; the MCP server completes the stdio handshake and advertises
   `doc_read` / `doc_write`.
+- **Published-path simulation**: the packed plugin tarball installs into a DSH
+  headless profile and a live agent session completes a guarded
+  `doc_read → doc_write → doc_read` round-trip on a real xlsx.
+- **Dependency pattern**: `@deepseek-ai/*` packages are declared as
+  `peerDependencies` (the ecosystem convention, e.g. dsh-kb-sieve). Declaring
+  them as regular deps makes pnpm install duplicate copies into profiles,
+  which breaks tool dispatch (symbol-keyed scheduler mismatch → `reading
+  'prepare'`). Only `@dsh-cowork/core` is a regular dependency — it is pure TS
+  and carries no cordis state.
 
 ## 1. Publish to npm
 
